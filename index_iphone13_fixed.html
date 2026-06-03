@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Vanpool Pass</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #123f73;
+      color: white;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      height: 100dvh;
+      background: #123f73;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .entry-screen {
+      height: 100vh;
+      height: 100dvh;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 18px;
+      background: #123f73;
+    }
+
+    .entry-screen h1 {
+      margin: 0;
+      font-size: 32px;
+      line-height: 1.1;
+      font-weight: 900;
+    }
+
+    .entry-screen input {
+      width: 100%;
+      padding: 18px;
+      border: none;
+      border-radius: 14px;
+      outline: none;
+      text-align: center;
+      font-size: 34px;
+      font-weight: 900;
+      color: #123f73;
+    }
+
+    .entry-screen button {
+      width: 100%;
+      padding: 18px;
+      border: none;
+      border-radius: 14px;
+      background: #5cff14;
+      color: #123f73;
+      font-size: 22px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .pass-screen {
+      height: 100vh;
+      height: 100dvh;
+      background: #102f70;
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+      padding: 76px 18px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .qr-wrap {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .qr {
+      width: 205px;
+      height: 205px;
+      background: white;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(29, 1fr);
+      grid-template-rows: repeat(29, 1fr);
+      gap: 1px;
+    }
+
+    .qr div.black {
+      background: #000;
+    }
+
+    .qr div.white {
+      background: #fff;
+    }
+
+    .qr-center {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      background: white;
+      top: 154px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .qr-center-inner-1 {
+      width: 39px;
+      height: 39px;
+      border: 6px solid black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr-center-inner-2 {
+      width: 22px;
+      height: 22px;
+      border: 5px solid black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr-center-inner-3 {
+      width: 7px;
+      height: 7px;
+      background: black;
+    }
+
+    .code {
+      margin-top: 32px;
+      color: #5cff14;
+      font-size: 52px;
+      line-height: 0.95;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .fare {
+      margin-top: 28px;
+      font-size: 35px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+    }
+
+    .zone {
+      margin-top: 28px;
+      font-size: 36px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: 0.3px;
+    }
+
+    .route {
+      margin-top: 22px;
+      font-size: 24px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .trip {
+      margin-top: 28px;
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+    }
+
+    .price {
+      margin-top: 24px;
+      font-size: 27px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .timer-area {
+      margin-top: 104px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .timer {
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      border: 4px solid white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 43px;
+      font-weight: 300;
+      line-height: 1;
+      position: relative;
+    }
+
+    .timer::after {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 8px solid transparent;
+      border-bottom-color: #5cff14;
+      transform: rotate(18deg);
+    }
+
+    .change-button {
+      display: none;
+    }
+
+    @media (max-height: 850px) {
+      .pass-screen {
+        padding-top: 58px;
+      }
+
+      .qr {
+        width: 190px;
+        height: 190px;
+        padding: 14px;
+      }
+
+      .qr-center {
+        top: 128px;
+        width: 44px;
+        height: 44px;
+      }
+
+      .qr-center-inner-1 {
+        width: 36px;
+        height: 36px;
+        border-width: 5px;
+      }
+
+      .qr-center-inner-2 {
+        width: 20px;
+        height: 20px;
+        border-width: 4px;
+      }
+
+      .code {
+        margin-top: 29px;
+        font-size: 50px;
+      }
+
+      .fare {
+        margin-top: 26px;
+        font-size: 33px;
+      }
+
+      .zone {
+        margin-top: 26px;
+        font-size: 34px;
+      }
+
+      .route {
+        margin-top: 20px;
+        font-size: 23px;
+      }
+
+      .trip {
+        margin-top: 26px;
+        font-size: 32px;
+      }
+
+      .price {
+        margin-top: 22px;
+        font-size: 25px;
+      }
+
+      .timer-area {
+        margin-top: 78px;
+      }
+
+      .timer {
+        width: 76px;
+        height: 76px;
+        font-size: 40px;
+      }
+    }
+
+    @media (max-height: 760px) {
+      .pass-screen {
+        padding-top: 42px;
+      }
+
+      .qr {
+        width: 170px;
+        height: 170px;
+        padding: 12px;
+      }
+
+      .qr-center {
+        top: 105px;
+        width: 40px;
+        height: 40px;
+      }
+
+      .qr-center-inner-1 {
+        width: 32px;
+        height: 32px;
+      }
+
+      .qr-center-inner-2 {
+        width: 18px;
+        height: 18px;
+      }
+
+      .code {
+        margin-top: 24px;
+        font-size: 44px;
+      }
+
+      .fare {
+        margin-top: 22px;
+        font-size: 30px;
+      }
+
+      .zone {
+        margin-top: 22px;
+        font-size: 31px;
+      }
+
+      .route {
+        margin-top: 17px;
+        font-size: 21px;
+      }
+
+      .trip {
+        margin-top: 22px;
+        font-size: 29px;
+      }
+
+      .price {
+        margin-top: 19px;
+        font-size: 23px;
+      }
+
+      .timer-area {
+        margin-top: 54px;
+      }
+
+      .timer {
+        width: 68px;
+        height: 68px;
+        font-size: 36px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+
+    <section id="entryScreen" class="entry-screen">
+      <h1>Enter Pass Code</h1>
+      <input id="codeInput" type="text" placeholder="6866" inputmode="numeric" pattern="[0-9]*" />
+      <button onclick="openPass()">Open Pass</button>
+    </section>
+
+    <section id="passScreen" class="pass-screen hidden">
+
+      <div class="qr-wrap">
+        <div id="qr" class="qr"></div>
+      </div>
+
+      <div class="qr-center">
+        <div class="qr-center-inner-1">
+          <div class="qr-center-inner-2">
+            <div class="qr-center-inner-3"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="displayCode" class="code">6866</div>
+
+      <div class="fare">FULL FARE</div>
+      <div class="zone">Zone 9 - Zone 1</div>
+      <div class="route">Spotsylvania - L Enfant</div>
+      <div class="trip">TEN TRIP</div>
+      <div class="price">$117.80</div>
+
+      <div class="timer-area">
+        <div id="timer" class="timer">4</div>
+      </div>
+
+      <button class="change-button" onclick="resetPass()"></button>
+
+    </section>
+  </main>
+
+  <script>
+    let seconds = 4;
+    let timerStarted = false;
+
+    function openPass() {
+      const input = document.getElementById("codeInput");
+      const enteredCode = input.value.replace(/\D/g, "").trim();
+
+      if (enteredCode === "") {
+        alert("Please enter a pass code.");
+        return;
+      }
+
+      document.getElementById("displayCode").textContent = enteredCode;
+      document.getElementById("entryScreen").classList.add("hidden");
+      document.getElementById("passScreen").classList.remove("hidden");
+
+      buildQr(enteredCode);
+      startTimer();
+    }
+
+    function resetPass() {
+      document.getElementById("passScreen").classList.add("hidden");
+      document.getElementById("entryScreen").classList.remove("hidden");
+      document.getElementById("codeInput").focus();
+    }
+
+    function qrCellIsBlack(x, y, seed) {
+      const topLeft = x < 7 && y < 7;
+      const topRight = x > 21 && y < 7;
+      const bottomLeft = x < 7 && y > 21;
+
+      const finder = topLeft || topRight || bottomLeft;
+
+      if (finder) {
+        const fx = x < 7 ? x : x - 22;
+        const fy = y < 7 ? y : y - 22;
+
+        return (
+          fx === 0 ||
+          fy === 0 ||
+          fx === 6 ||
+          fy === 6 ||
+          (fx >= 2 && fx <= 4 && fy >= 2 && fy <= 4)
+        );
+      }
+
+      const patternA = (x * 17 + y * 31 + seed) % 9;
+      const patternB = (x * y + seed + x * 13) % 11;
+      const patternC = (x * 5 + y * 7 + seed) % 6;
+
+      return patternA < 4 || patternB < 3 || patternC === 0;
+    }
+
+    function buildQr(code) {
+      const qr = document.getElementById("qr");
+      qr.innerHTML = "";
+
+      const seed = code
+        .split("")
+        .reduce((sum, char) => sum + char.charCodeAt(0), 0);
+
+      for (let y = 0; y < 29; y++) {
+        for (let x = 0; x < 29; x++) {
+          const cell = document.createElement("div");
+          cell.className = qrCellIsBlack(x, y, seed) ? "black" : "white";
+          qr.appendChild(cell);
+        }
+      }
+    }
+
+    function startTimer() {
+      if (timerStarted) return;
+
+      timerStarted = true;
+
+      setInterval(() => {
+        seconds = seconds <= 0 ? 29 : seconds - 1;
+        document.getElementById("timer").textContent = seconds;
+      }, 1000);
+    }
+
+    document.getElementById("codeInput").addEventListener("input", function () {
+      this.value = this.value.replace(/\D/g, "");
+    });
+
+    buildQr("6866");
+  </script>
+</body>
+</html>
